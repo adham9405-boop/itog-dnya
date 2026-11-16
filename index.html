@@ -11,48 +11,85 @@
     --card: var(--tg-theme-section-bg-color, var(--tg-theme-bg-color, #fff));
     --text: var(--tg-theme-text-color, #111);
     --hint: var(--tg-theme-hint-color, #8a8a8e);
-    --accent: #d6235f;            /* малиновый — цвет бренда */
+    --accent: #d6235f;              /* малиновый — цвет бренда */
+    --accent-soft: color-mix(in srgb, var(--accent) 12%, var(--card));
     --ok: #2fb36b;
+    --chip: color-mix(in srgb, var(--hint) 14%, transparent);
     --line: color-mix(in srgb, var(--hint) 22%, transparent);
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body { margin: 0; background: var(--bg); color: var(--text);
          font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
-  main { padding: 16px 16px 96px; max-width: 520px; margin: 0 auto; }
-  header { padding: 6px 4px 14px; }
+  main { padding: 12px 16px 100px; max-width: 520px; margin: 0 auto; }
+  header { padding: 4px 4px 12px; }
   .date { color: var(--hint); font-size: 14px; }
-  h1 { margin: 2px 0 0; font-size: 26px; letter-spacing: -.02em; }
-  .streak { display: inline-flex; gap: 6px; align-items: center; margin-top: 10px; padding: 6px 12px;
-            border-radius: 999px; background: color-mix(in srgb, var(--accent) 12%, var(--card));
-            color: var(--accent); font-weight: 600; font-size: 14px; }
-  section { background: var(--card); border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; }
-  h2 { margin: 0 0 10px; font-size: 13px; font-weight: 600; text-transform: uppercase;
-       letter-spacing: .06em; color: var(--hint); }
-  ol { margin: 0; padding-left: 20px; }
-  ol li { padding: 3px 0; }
-  .q { padding: 10px 0; border-top: 1px solid var(--line); }
-  .q:first-of-type { border-top: 0; padding-top: 0; }
-  .q-title { font-weight: 600; margin-bottom: 8px; }
+  h1 { margin: 2px 0 10px; font-size: 28px; letter-spacing: -.02em; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { padding: 5px 11px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--chip); }
+  .chip.hot { background: var(--accent-soft); color: var(--accent); }
+
+  section { background: var(--card); border-radius: 18px; padding: 14px 16px; margin-bottom: 12px; }
+  h2 { margin: 0 0 12px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--hint); }
+
+  .quote { background: linear-gradient(135deg, var(--accent) 0%, #a3164a 100%); color: #fff; }
+  .quote h2 { color: rgba(255,255,255,.75); }
+  .quote p { margin: 0; font-size: 16px; line-height: 1.5; }
+  .quote .src { margin-top: 10px; font-size: 13px; opacity: .8; }
+  .quote.more p { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+  .quote button { margin-top: 8px; padding: 0; border: 0; background: none; color: #fff; font: inherit; font-size: 13px;
+                  text-decoration: underline; opacity: .85; }
+
+  .deeds { display: flex; gap: 14px; align-items: center; }
+  .ring { flex: none; width: 76px; height: 76px; position: relative; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 20px; }
+  .deeds ul { list-style: none; margin: 0; padding: 0; flex: 1; }
+  .deeds li { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; font-size: 15px; }
+  .tick { flex: none; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--line); margin-top: 1px;
+          display: grid; place-items: center; font-size: 12px; color: #fff; }
+  .tick.on { background: var(--ok); border-color: var(--ok); }
+
+  .row { padding: 12px 0; border-top: 1px solid var(--line); }
+  .row:first-of-type { border-top: 0; padding-top: 0; }
+  .row-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .row-title { font-weight: 600; }
+  .row-hint { font-size: 13px; color: var(--hint); }
+  .row-hint.ok { color: var(--ok); font-weight: 600; }
+  .stepper { display: flex; align-items: center; gap: 10px; }
+  .stepper button { width: 52px; height: 48px; border: 0; border-radius: 14px; background: var(--chip); color: var(--text);
+                    font: inherit; font-size: 24px; font-weight: 500; }
+  .stepper output { flex: 1; text-align: center; font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stepper output.unset { color: var(--hint); font-weight: 500; }
+  .norm { display: flex; gap: 4px; margin-top: 8px; }
+  .norm i { flex: 1; height: 5px; border-radius: 3px; background: var(--line); }
+  .norm i.on { background: var(--ok); }
   .seg { display: flex; gap: 6px; }
-  .seg button { flex: 1; min-height: 44px; border: 0; border-radius: 12px; font: inherit; font-weight: 600;
-                background: color-mix(in srgb, var(--hint) 14%, transparent); color: var(--text); }
+  .seg button { flex: 1; min-height: 44px; border: 0; border-radius: 12px; font: inherit; font-weight: 600; font-size: 15px;
+                background: var(--chip); color: var(--text); }
   .seg button.on { background: var(--accent); color: #fff; }
+  .seg button.on.no { background: color-mix(in srgb, var(--hint) 55%, transparent); }
   .rest { color: var(--hint); }
-  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
-  .day { padding: 8px 0; border-radius: 12px; font-size: 13px; }
+  textarea { width: 100%; min-height: 76px; resize: vertical; border: 0; border-radius: 12px; padding: 10px 12px;
+             background: var(--chip); color: var(--text); font: inherit; font-size: 15px; }
+  textarea::placeholder { color: var(--hint); }
+
+  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-bottom: 14px; }
+  .day { padding: 7px 0; border-radius: 12px; font-size: 12px; }
   .day.today { outline: 2px solid var(--accent); }
-  .day b { display: block; font-size: 17px; margin: 2px 0; }
   .day .wd { color: var(--hint); }
-  .dots { display: flex; justify-content: center; gap: 3px; height: 8px; }
+  .day b { display: block; font-size: 17px; margin: 2px 0; }
+  .dots { display: flex; justify-content: center; gap: 3px; height: 7px; }
   .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--line); }
   .dot.on { background: var(--ok); }
-  .legend { margin-top: 10px; color: var(--hint); font-size: 12px; }
-  .bar { margin: 8px 0 12px; }
+  .bar { margin: 10px 0 0; }
   .bar-top { display: flex; justify-content: space-between; font-size: 14px; }
+  .bar-top span:last-child { color: var(--hint); font-variant-numeric: tabular-nums; }
   .track { height: 8px; border-radius: 4px; background: var(--line); margin-top: 6px; overflow: hidden; }
-  .fill { height: 100%; background: var(--accent); border-radius: 4px; }
+  .fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .3s; }
+  .fill.done { background: var(--ok); }
+  .legend { margin-top: 2px; color: var(--hint); font-size: 12px; }
   .note { color: var(--hint); font-size: 13px; text-align: center; padding: 4px 8px; }
-  #save { display: none; position: fixed; left: 16px; right: 16px; bottom: 16px; min-height: 50px; border: 0;
+  #save { display: none; position: fixed; left: 16px; right: 16px; bottom: 16px; min-height: 52px; border: 0;
           border-radius: 14px; background: var(--accent); color: #fff; font: inherit; font-weight: 600; }
 </style>
 </head>
@@ -61,22 +98,52 @@
   <header>
     <div class="date" id="date"></div>
     <h1>Итог дня</h1>
-    <div class="streak" id="streak"></div>
+    <div class="chips" id="chips"></div>
   </header>
 
-  <section>
-    <h2>Сегодня 3 дела</h2>
-    <ol id="deeds"></ol>
+  <section class="quote" id="quote" hidden>
+    <h2>Напоминание дня</h2>
+    <p id="q-text"></p>
+    <div class="src" id="q-src"></div>
   </section>
 
-  <section id="answers">
-    <h2>Отметь</h2>
+  <section>
+    <h2>Дела дня</h2>
+    <div class="deeds">
+      <div class="ring">
+        <svg width="76" height="76" viewBox="0 0 76 76">
+          <circle cx="38" cy="38" r="32" fill="none" stroke="var(--line)" stroke-width="8"/>
+          <circle id="ring" cx="38" cy="38" r="32" fill="none" stroke="var(--ok)" stroke-width="8"
+                  stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201"/>
+        </svg>
+        <b id="ring-n">0/3</b>
+      </div>
+      <ul id="deeds"></ul>
+    </div>
+  </section>
+
+  <section id="work">
+    <h2>Работа</h2>
+  </section>
+
+  <section id="content">
+    <h2>Контент</h2>
+  </section>
+
+  <section id="self">
+    <h2>Утро и сила</h2>
+  </section>
+
+  <section>
+    <h2>Заметка дня</h2>
+    <textarea id="text" maxlength="300" placeholder="Что получилось, что мешало — одной-двумя фразами"></textarea>
   </section>
 
   <section>
     <h2>Неделя</h2>
     <div class="week" id="week"></div>
-    <div class="legend">Точки: звонки в норме · ролик · утро без сна</div>
+    <div id="week-bars"></div>
+    <div class="legend">Точки дня: звонки в норме · ролик · утро без сна</div>
   </section>
 
   <section>
@@ -90,12 +157,8 @@
 <script>
 (function () {
   var tg = window.Telegram && Telegram.WebApp;
-  var ITEMS = [
-    {k: "calls", t: "📞 Звонки", o: [["0", "0"], ["1", "1"], ["2", "2"], ["3", "3"], ["4+", "4+"]]},
-    {k: "video", t: "🎬 Ролик", o: [["✅", "Снял"], ["❌", "Не снял"]]},
-    {k: "fajr", t: "🌅 Утро без сна", o: [["✅", "Не ложился"], ["❌", "Лёг"]]}
-  ];
   var WD = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
+  var NORM = 3;
 
   function decode(h) {
     try {
@@ -115,100 +178,211 @@
     if (text != null) e.textContent = text;
     return e;
   }
-  function calls(r) { var v = (r || {}).calls; return v === "4+" ? 4 : v ? +v : 0; }
+  function num(r, k) { var v = (r || {})[k]; return v === "4+" ? 4 : /^\d+$/.test(v || "") ? +v : 0; }
+  function haptic() { if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged(); }
 
-  var S = decode(location.hash.slice(1)) || {t: "", r: {}, w: [], s: 0, n: 0, deeds: [], m: null};
-  var today = iso(new Date());
+  var S = decode(location.hash.slice(1)) || {t: "", r: {}, w: [], s: 0, n: 0, deeds: [], m: null, g: null, q: ""};
+  var now = new Date(), today = iso(now), sunday = now.getDay() === 0;
   var fresh = S.t === today;                    // ссылка от бота — сегодняшняя
-  var rec = Object.assign({}, fresh ? S.r : {});
-  var now = new Date();
-  var sunday = now.getDay() === 0;
+  var base = fresh ? (S.r || {}) : {};
+  var rec = Object.assign({}, base);
 
+  // --- шапка ---
   document.getElementById("date").textContent =
-    WD[(now.getDay() + 6) % 7] + " " + now.toLocaleDateString("ru-RU", {day: "numeric", month: "long"}) +
-    (fresh && S.n >= 1 ? " · день " + S.n + (S.n <= 30 ? " из 30" : "") : "");
-  document.getElementById("streak").textContent = "🔥 Подряд с нормой: " + (S.s || 0) + " дн.";
+    WD[(now.getDay() + 6) % 7] + ", " + now.toLocaleDateString("ru-RU", {day: "numeric", month: "long"});
+  var chips = document.getElementById("chips");
+  if (fresh && S.n >= 1) chips.appendChild(el("span", "chip", "Спринт: день " + S.n + (S.n <= 30 ? " из 30" : "")));
+  chips.appendChild(el("span", "chip hot", "🔥 Подряд с нормой: " + (S.s || 0)));
 
-  var ol = document.getElementById("deeds");
-  (S.deeds || []).forEach(function (d) { ol.appendChild(el("li", "", d)); });
-
-  var box = document.getElementById("answers");
-  ITEMS.forEach(function (it) {
-    var q = el("div", "q");
-    q.appendChild(el("div", "q-title", it.t));
-    if (it.k === "calls" && sunday) {
-      q.appendChild(el("div", "rest", "Воскресенье — без звонков"));
-      box.appendChild(q);
-      return;
+  // --- напоминание дня: «текст» — источник ---
+  if (S.q) {
+    var cut = S.q.lastIndexOf(" — ");
+    var qt = cut > 0 ? S.q.slice(0, cut) : S.q, qs = cut > 0 ? S.q.slice(cut + 3) : "";
+    var box = document.getElementById("quote");
+    box.hidden = false;
+    document.getElementById("q-text").textContent = qt;
+    document.getElementById("q-src").textContent = qs;
+    if (qt.length > 260) {
+      box.classList.add("more");
+      var more = el("button", "", "Читать полностью");
+      more.type = "button";
+      more.onclick = function () { box.classList.remove("more"); more.remove(); };
+      box.appendChild(more);
     }
-    var seg = el("div", "seg");
-    it.o.forEach(function (o) {
-      var b = el("button", rec[it.k] === o[0] ? "on" : "", o[1]);
-      b.type = "button";
-      b.onclick = function () {
-        rec[it.k] = o[0];
-        Array.prototype.forEach.call(seg.children, function (x) { x.className = ""; });
-        b.className = "on";
-        if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
-        update();
-      };
-      seg.appendChild(b);
-    });
-    q.appendChild(seg);
-    box.appendChild(q);
-  });
-
-  var week = document.getElementById("week");
-  function drawWeek() {
-  week.textContent = "";
-  (S.w || []).forEach(function (pair, i) {
-    var r = pair[0] === today ? rec : pair[1];
-    var c = el("div", "day" + (pair[0] === today ? " today" : ""));
-    c.appendChild(el("div", "wd", WD[i]));
-    c.appendChild(el("b", "", i === 6 ? "—" : (r && r.calls) || "·"));
-    var dots = el("div", "dots");
-    [i !== 6 && calls(r) >= 3, r && r.video === "✅", r && r.fajr === "✅"].forEach(function (on) {
-      dots.appendChild(el("span", "dot" + (on ? " on" : "")));
-    });
-    c.appendChild(dots);
-    week.appendChild(c);
-  });
   }
-  drawWeek();
 
-  var month = document.getElementById("month");
-  if (S.m) {
-    [["📞 Звонки", S.m.calls, S.m.calls_goal], ["🎬 Ролики", S.m.video, S.m.video_goal]].forEach(function (b) {
+  // --- дела дня: отмечаются сами по ответам ---
+  var DEEDS = sunday
+    ? [[S.deeds[0] || "Воскресенье — день семьи", null], [S.deeds[1] || "📖 Страница Корана", "quran"],
+       [S.deeds[2] || "📊 Итог недели", null]]
+    : [[S.deeds[0] || "📞 3 звонка", "calls"], [S.deeds[1] || "🎬 1 ролик", "video"], [S.deeds[2] || "📖 Страница Корана", "quran"]];
+  function deedDone(k) {
+    if (k === "calls") return num(rec, "calls") >= NORM;
+    return k ? rec[k] === "✅" : false;
+  }
+  function drawDeeds() {
+    var ul = document.getElementById("deeds"); ul.textContent = "";
+    var marks = DEEDS.filter(function (d) { return d[1]; });
+    var done = marks.filter(function (d) { return deedDone(d[1]); }).length;
+    DEEDS.forEach(function (d) {
+      var li = el("li");
+      var on = d[1] && deedDone(d[1]);
+      li.appendChild(el("span", "tick" + (on ? " on" : ""), on ? "✓" : ""));
+      li.appendChild(el("span", "", d[0]));
+      ul.appendChild(li);
+    });
+    document.getElementById("ring-n").textContent = done + "/" + marks.length;
+    document.getElementById("ring").setAttribute("stroke-dashoffset", String(201 * (1 - done / marks.length)));
+  }
+
+  // --- элементы ввода ---
+  function stepper(parent, key, title, hintFn) {
+    var row = el("div", "row"), head = el("div", "row-head");
+    head.appendChild(el("span", "row-title", title));
+    var hint = el("span", "row-hint"); head.appendChild(hint);
+    row.appendChild(head);
+    var st = el("div", "stepper");
+    var minus = el("button", "", "−"), out = el("output"), plus = el("button", "", "+");
+    minus.type = plus.type = "button";
+    function show() {
+      var set = rec[key] != null && rec[key] !== "";
+      out.textContent = set ? num(rec, key) : "—";
+      out.className = set ? "" : "unset";
+      if (hintFn) hintFn(hint, row);
+    }
+    minus.onclick = function () { rec[key] = String(Math.max(0, num(rec, key) - 1)); haptic(); show(); update(); };
+    plus.onclick = function () { rec[key] = String(Math.min(99, num(rec, key) + 1)); haptic(); show(); update(); };
+    st.appendChild(minus); st.appendChild(out); st.appendChild(plus);
+    row.appendChild(st);
+    parent.appendChild(row);
+    show();
+    return row;
+  }
+  var segs = {};
+  function seg(parent, key, title, yes, no, after) {
+    var row = el("div", "row"), head = el("div", "row-head");
+    head.appendChild(el("span", "row-title", title));
+    row.appendChild(head);
+    var s = el("div", "seg");
+    [["✅", yes], ["❌", no]].forEach(function (o) {
+      var b = el("button", "", o[1]);
+      b.type = "button";
+      b.dataset.v = o[0];
+      b.onclick = function () { rec[key] = o[0]; haptic(); if (after) after(o[0]); paint(); update(); };
+      s.appendChild(b);
+    });
+    function paint() {
+      Array.prototype.forEach.call(s.children, function (b) {
+        b.className = rec[key] === b.dataset.v ? "on" + (b.dataset.v === "❌" ? " no" : "") : "";
+      });
+    }
+    segs[key] = paint;
+    row.appendChild(s);
+    parent.appendChild(row);
+    paint();
+  }
+
+  var work = document.getElementById("work");
+  if (sunday) {
+    var r = el("div", "row"); r.appendChild(el("div", "rest", "📞 Воскресенье — без звонков. Семья и итог недели."));
+    work.appendChild(r);
+  } else {
+    stepper(work, "calls", "📞 Звонки", function (hint, row) {
+      var n = num(rec, "calls"), lack = NORM - n;
+      hint.textContent = lack <= 0 ? "Норма есть ✓" : "До нормы " + lack;
+      hint.className = "row-hint" + (lack <= 0 ? " ok" : "");
+      var bar = row.querySelector(".norm");
+      if (!bar) { bar = el("div", "norm"); for (var i = 0; i < NORM; i++) bar.appendChild(el("i")); row.appendChild(bar); }
+      Array.prototype.forEach.call(bar.children, function (x, i) { x.className = i < n ? "on" : ""; });
+    });
+  }
+  stepper(work, "meet", "🏠 Встречи и показы", function (hint) { hint.textContent = "цель недели — " + ((S.g || {}).meet || 2); });
+
+  var content = document.getElementById("content");
+  seg(content, "video", "🎬 Ролик", "Снял", "Не снял", function (v) {
+    if (v === "❌" && rec.posted === "✅") { rec.posted = "❌"; segs.posted(); }
+  });
+  seg(content, "posted", "📤 Публикация", "Выложил", "Не выложил", function (v) {
+    if (v === "✅" && rec.video !== "✅") { rec.video = "✅"; segs.video(); }
+  });
+
+  var self = document.getElementById("self");
+  seg(self, "fajr", "🌅 После фаджра", "Не ложился", "Лёг");
+  seg(self, "quran", "📖 Коран", "Читал", "Не читал");
+  seg(self, "sport", "💪 Тренировка", "Была", "Не было");
+
+  var text = document.getElementById("text");
+  text.value = rec.note || "";
+  text.oninput = function () { rec.note = text.value; update(); };
+
+  // --- неделя ---
+  function drawWeek() {
+    var week = document.getElementById("week"); week.textContent = "";
+    var tot = {calls: 0, video: 0, meet: 0, sport: 0};
+    (S.w || []).forEach(function (pair, i) {
+      var r = pair[0] === today ? rec : pair[1] || {};
+      tot.calls += num(r, "calls"); tot.meet += num(r, "meet");
+      tot.video += r.video === "✅" ? 1 : 0; tot.sport += r.sport === "✅" ? 1 : 0;
+      var c = el("div", "day" + (pair[0] === today ? " today" : ""));
+      c.appendChild(el("div", "wd", WD[i]));
+      c.appendChild(el("b", "", i === 6 ? "—" : (r.calls != null && r.calls !== "" ? String(num(r, "calls")) : "·")));
+      var dots = el("div", "dots");
+      [i !== 6 && num(r, "calls") >= NORM, r.video === "✅", r.fajr === "✅"].forEach(function (on) {
+        dots.appendChild(el("span", "dot" + (on ? " on" : "")));
+      });
+      c.appendChild(dots);
+      week.appendChild(c);
+    });
+    var g = S.g || {calls: 18, video: 5, meet: 2, sport: 4};
+    bars(document.getElementById("week-bars"),
+         [["📞 Звонки", tot.calls, g.calls], ["🎬 Ролики", tot.video, g.video],
+          ["🏠 Встречи", tot.meet, g.meet], ["💪 Тренировки", tot.sport, g.sport]]);
+  }
+  function bars(box, list) {
+    box.textContent = "";
+    list.forEach(function (b) {
       var w = el("div", "bar"), top = el("div", "bar-top");
       top.appendChild(el("span", "", b[0]));
       top.appendChild(el("span", "", b[1] + " из " + b[2]));
-      var tr = el("div", "track"), f = el("div", "fill");
+      var tr = el("div", "track"), f = el("div", "fill" + (b[1] >= b[2] ? " done" : ""));
       f.style.width = Math.min(100, Math.round(100 * b[1] / b[2])) + "%";
-      tr.appendChild(f); w.appendChild(top); w.appendChild(tr); month.appendChild(w);
+      tr.appendChild(f); w.appendChild(top); w.appendChild(tr); box.appendChild(w);
     });
   }
 
-  var note = document.getElementById("note");
-  if (!fresh) note.textContent = "Неделя и серия — на момент последнего сообщения бота.";
+  // --- месяц спринта: сегодняшнее добавляем к сохранённому ---
+  function drawMonth() {
+    if (!S.m) return;
+    var dc = num(rec, "calls") - num(base, "calls");
+    var dv = (rec.video === "✅" ? 1 : 0) - (base.video === "✅" ? 1 : 0);
+    bars(document.getElementById("month"),
+         [["📞 Звонки", S.m.calls + dc, S.m.calls_goal], ["🎬 Ролики", S.m.video + dv, S.m.video_goal]]);
+  }
 
+  if (!fresh) document.getElementById("note").textContent = "Неделя и серия — на момент последнего сообщения бота.";
+
+  // --- сохранение: только изменённое, бот пишет в отчёт ---
+  var KEYS = ["calls", "meet", "video", "posted", "fajr", "quran", "sport", "note"];
   var btn = document.getElementById("save");
   function payload() {
     var out = {d: today};
-    ITEMS.forEach(function (it) { if (rec[it.k] && !(it.k === "calls" && sunday)) out[it.k] = rec[it.k]; });
+    KEYS.forEach(function (k) {
+      if (k === "calls" && sunday) return;
+      var v = k === "note" ? (rec.note || "").trim() : rec[k];
+      if (v != null && v !== (base[k] || (k === "note" ? "" : undefined))) out[k] = v;
+    });
     return out;
   }
-  function changed() {
-    var p = payload(), base = fresh ? S.r : {};
-    return Object.keys(p).some(function (k) { return k !== "d" && p[k] !== base[k]; });
-  }
+  function changed() { return Object.keys(payload()).length > 1; }
   function send() {
     var data = JSON.stringify(payload());
-    if (tg && tg.sendData) tg.sendData(data); else note.textContent = data;
+    if (tg && tg.sendData && tg.initData !== undefined && tg.platform !== "unknown") tg.sendData(data);
+    else document.getElementById("note").textContent = data;
   }
   function update() {
-    drawWeek();
+    drawDeeds(); drawWeek(); drawMonth();
     var on = changed();
-    if (tg && tg.MainButton) {
+    if (tg && tg.MainButton && tg.platform !== "unknown") {
       tg.MainButton.setParams({text: "Сохранить", color: "#d6235f", text_color: "#ffffff"});
       on ? tg.MainButton.show() : tg.MainButton.hide();
     } else {
