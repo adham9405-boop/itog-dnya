@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Итог дня</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --bg: var(--tg-theme-secondary-bg-color, #f2f2f7);
+    --card: var(--tg-theme-section-bg-color, var(--tg-theme-bg-color, #fff));
+    --text: var(--tg-theme-text-color, #111);
+    --hint: var(--tg-theme-hint-color, #8a8a8e);
+    --accent: #d6235f;            /* малиновый — цвет бренда */
+    --ok: #2fb36b;
+    --line: color-mix(in srgb, var(--hint) 22%, transparent);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
+  main { padding: 16px 16px 96px; max-width: 520px; margin: 0 auto; }
+  header { padding: 6px 4px 14px; }
+  .date { color: var(--hint); font-size: 14px; }
+  h1 { margin: 2px 0 0; font-size: 26px; letter-spacing: -.02em; }
+  .streak { display: inline-flex; gap: 6px; align-items: center; margin-top: 10px; padding: 6px 12px;
+            border-radius: 999px; background: color-mix(in srgb, var(--accent) 12%, var(--card));
+            color: var(--accent); font-weight: 600; font-size: 14px; }
+  section { background: var(--card); border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; }
+  h2 { margin: 0 0 10px; font-size: 13px; font-weight: 600; text-transform: uppercase;
+       letter-spacing: .06em; color: var(--hint); }
+  ol { margin: 0; padding-left: 20px; }
+  ol li { padding: 3px 0; }
+  .q { padding: 10px 0; border-top: 1px solid var(--line); }
+  .q:first-of-type { border-top: 0; padding-top: 0; }
+  .q-title { font-weight: 600; margin-bottom: 8px; }
+  .seg { display: flex; gap: 6px; }
+  .seg button { flex: 1; min-height: 44px; border: 0; border-radius: 12px; font: inherit; font-weight: 600;
+                background: color-mix(in srgb, var(--hint) 14%, transparent); color: var(--text); }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .rest { color: var(--hint); }
+  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+  .day { padding: 8px 0; border-radius: 12px; font-size: 13px; }
+  .day.today { outline: 2px solid var(--accent); }
+  .day b { display: block; font-size: 17px; margin: 2px 0; }
+  .day .wd { color: var(--hint); }
+  .dots { display: flex; justify-content: center; gap: 3px; height: 8px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--line); }
+  .dot.on { background: var(--ok); }
+  .legend { margin-top: 10px; color: var(--hint); font-size: 12px; }
+  .bar { margin: 8px 0 12px; }
+  .bar-top { display: flex; justify-content: space-between; font-size: 14px; }
+  .track { height: 8px; border-radius: 4px; background: var(--line); margin-top: 6px; overflow: hidden; }
+  .fill { height: 100%; background: var(--accent); border-radius: 4px; }
+  .note { color: var(--hint); font-size: 13px; text-align: center; padding: 4px 8px; }
+  #save { display: none; position: fixed; left: 16px; right: 16px; bottom: 16px; min-height: 50px; border: 0;
+          border-radius: 14px; background: var(--accent); color: #fff; font: inherit; font-weight: 600; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="date" id="date"></div>
+    <h1>Итог дня</h1>
+    <div class="streak" id="streak"></div>
+  </header>
+
+  <section>
+    <h2>Сегодня 3 дела</h2>
+    <ol id="deeds"></ol>
+  </section>
+
+  <section id="answers">
+    <h2>Отметь</h2>
+  </section>
+
+  <section>
+    <h2>Неделя</h2>
+    <div class="week" id="week"></div>
+    <div class="legend">Точки: звонки в норме · ролик · утро без сна</div>
+  </section>
+
+  <section>
+    <h2>Месяц спринта</h2>
+    <div id="month"></div>
+  </section>
+
+  <p class="note" id="note"></p>
+  <button id="save">Сохранить</button>
+</main>
+<script>
+(function () {
+  var tg = window.Telegram && Telegram.WebApp;
+  var ITEMS = [
+    {k: "calls", t: "📞 Звонки", o: [["0", "0"], ["1", "1"], ["2", "2"], ["3", "3"], ["4+", "4+"]]},
+    {k: "video", t: "🎬 Ролик", o: [["✅", "Снял"], ["❌", "Не снял"]]},
+    {k: "fajr", t: "🌅 Утро без сна", o: [["✅", "Не ложился"], ["❌", "Лёг"]]}
+  ];
+  var WD = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
+
+  function decode(h) {
+    try {
+      h = h.replace(/-/g, "+").replace(/_/g, "/");
+      var bin = atob(h + "===".slice((h.length + 3) % 4));
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return JSON.parse(new TextDecoder().decode(bytes));
+    } catch (e) { return null; }
+  }
+  function iso(d) {
+    return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
+  }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function calls(r) { var v = (r || {}).calls; return v === "4+" ? 4 : v ? +v : 0; }
+
+  var S = decode(location.hash.slice(1)) || {t: "", r: {}, w: [], s: 0, n: 0, deeds: [], m: null};
+  var today = iso(new Date());
+  var fresh = S.t === today;                    // ссылка от бота — сегодняшняя
+  var rec = Object.assign({}, fresh ? S.r : {});
+  var now = new Date();
+  var sunday = now.getDay() === 0;
+
+  document.getElementById("date").textContent =
+    WD[(now.getDay() + 6) % 7] + " " + now.toLocaleDateString("ru-RU", {day: "numeric", month: "long"}) +
+    (fresh && S.n >= 1 ? " · день " + S.n + (S.n <= 30 ? " из 30" : "") : "");
+  document.getElementById("streak").textContent = "🔥 Подряд с нормой: " + (S.s || 0) + " дн.";
+
+  var ol = document.getElementById("deeds");
+  (S.deeds || []).forEach(function (d) { ol.appendChild(el("li", "", d)); });
+
+  var box = document.getElementById("answers");
+  ITEMS.forEach(function (it) {
+    var q = el("div", "q");
+    q.appendChild(el("div", "q-title", it.t));
+    if (it.k === "calls" && sunday) {
+      q.appendChild(el("div", "rest", "Воскресенье — без звонков"));
+      box.appendChild(q);
+      return;
+    }
+    var seg = el("div", "seg");
+    it.o.forEach(function (o) {
+      var b = el("button", rec[it.k] === o[0] ? "on" : "", o[1]);
+      b.type = "button";
+      b.onclick = function () {
+        rec[it.k] = o[0];
+        Array.prototype.forEach.call(seg.children, function (x) { x.className = ""; });
+        b.className = "on";
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        update();
+      };
+      seg.appendChild(b);
+    });
+    q.appendChild(seg);
+    box.appendChild(q);
+  });
+
+  var week = document.getElementById("week");
+  function drawWeek() {
+  week.textContent = "";
+  (S.w || []).forEach(function (pair, i) {
+    var r = pair[0] === today ? rec : pair[1];
+    var c = el("div", "day" + (pair[0] === today ? " today" : ""));
+    c.appendChild(el("div", "wd", WD[i]));
+    c.appendChild(el("b", "", i === 6 ? "—" : (r && r.calls) || "·"));
+    var dots = el("div", "dots");
+    [i !== 6 && calls(r) >= 3, r && r.video === "✅", r && r.fajr === "✅"].forEach(function (on) {
+      dots.appendChild(el("span", "dot" + (on ? " on" : "")));
+    });
+    c.appendChild(dots);
+    week.appendChild(c);
+  });
+  }
+  drawWeek();
+
+  var month = document.getElementById("month");
+  if (S.m) {
+    [["📞 Звонки", S.m.calls, S.m.calls_goal], ["🎬 Ролики", S.m.video, S.m.video_goal]].forEach(function (b) {
+      var w = el("div", "bar"), top = el("div", "bar-top");
+      top.appendChild(el("span", "", b[0]));
+      top.appendChild(el("span", "", b[1] + " из " + b[2]));
+      var tr = el("div", "track"), f = el("div", "fill");
+      f.style.width = Math.min(100, Math.round(100 * b[1] / b[2])) + "%";
+      tr.appendChild(f); w.appendChild(top); w.appendChild(tr); month.appendChild(w);
+    });
+  }
+
+  var note = document.getElementById("note");
+  if (!fresh) note.textContent = "Неделя и серия — на момент последнего сообщения бота.";
+
+  var btn = document.getElementById("save");
+  function payload() {
+    var out = {d: today};
+    ITEMS.forEach(function (it) { if (rec[it.k] && !(it.k === "calls" && sunday)) out[it.k] = rec[it.k]; });
+    return out;
+  }
+  function changed() {
+    var p = payload(), base = fresh ? S.r : {};
+    return Object.keys(p).some(function (k) { return k !== "d" && p[k] !== base[k]; });
+  }
+  function send() {
+    var data = JSON.stringify(payload());
+    if (tg && tg.sendData) tg.sendData(data); else note.textContent = data;
+  }
+  function update() {
+    drawWeek();
+    var on = changed();
+    if (tg && tg.MainButton) {
+      tg.MainButton.setParams({text: "Сохранить", color: "#d6235f", text_color: "#ffffff"});
+      on ? tg.MainButton.show() : tg.MainButton.hide();
+    } else {
+      btn.style.display = on ? "block" : "none";
+    }
+  }
+  btn.onclick = send;
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    if (tg.MainButton) tg.MainButton.onClick(send);
+  }
+  update();
+})();
+</script>
+</body>
+</html>
